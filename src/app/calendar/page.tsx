@@ -174,7 +174,7 @@ function EventCard({ event }: { event: Record<string, unknown> }) {
           </p>
         </div>
       </div>
-      {event.description && (
+      {event.description !== undefined && event.description !== null && (
         <p className="text-sm text-slate-400 mt-3 border-t border-slate-800 pt-3">
           {event.description as string}
         </p>

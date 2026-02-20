@@ -232,7 +232,7 @@ function DeskArea({
         </div>
 
         {/* Current Task */}
-        {member.currentTask && (
+        {member.currentTask !== undefined && member.currentTask !== null && (
           <div className="mt-3 bg-slate-900/80 rounded-lg p-2">
             <p className="text-xs text-slate-400 text-center truncate max-w-32">
               🖥️ {member.currentTask as string}
