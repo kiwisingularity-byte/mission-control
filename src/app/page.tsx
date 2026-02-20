@@ -58,10 +58,10 @@ export default function Home() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard title="Active Tasks" value="—" icon="📋" color="blue" />
-          <StatCard title="Content Ideas" value="—" icon="💡" color="yellow" />
-          <StatCard title="Memories" value="—" icon="🧠" color="purple" />
-          <StatCard title="Upcoming Events" value="—" icon="📅" color="green" />
+          <StatCard title="Active Tasks" value="—" icon="📋" color="blue" href="/tasks" />
+          <StatCard title="Content Ideas" value="—" icon="💡" color="yellow" href="/content" />
+          <StatCard title="Memories" value="—" icon="🧠" color="purple" href="/memory" />
+          <StatCard title="Upcoming Events" value="—" icon="📅" color="green" href="/calendar" />
         </div>
 
         {/* Quick Access Cards */}
@@ -136,12 +136,14 @@ function StatCard({
   title, 
   value, 
   icon, 
-  color 
+  color,
+  href 
 }: { 
   title: string; 
   value: string; 
   icon: string; 
-  color: "blue" | "yellow" | "purple" | "green" 
+  color: "blue" | "yellow" | "purple" | "green";
+  href: string;
 }) {
   const colors = {
     blue: "from-blue-500/20 to-blue-600/20 border-blue-500/30",
@@ -151,13 +153,15 @@ function StatCard({
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-4`}>
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-slate-400">{title}</span>
-        <span className="text-xl">{icon}</span>
+    <Link href={href} className="block">
+      <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-4 hover:border-slate-600 transition-colors cursor-pointer`}>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-slate-400">{title}</span>
+          <span className="text-xl">{icon}</span>
+        </div>
+        <p className="text-3xl font-bold mt-2">{value}</p>
       </div>
-      <p className="text-3xl font-bold mt-2">{value}</p>
-    </div>
+    </Link>
   );
 }
 
