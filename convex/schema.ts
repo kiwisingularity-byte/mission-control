@@ -104,4 +104,29 @@ export default defineSchema({
     details: v.optional(v.string()),
     timestamp: v.number(),
   }),
+
+  // Media Library
+  media: defineTable({
+    filename: v.string(),
+    originalPath: v.string(), // Full path to file
+    type: v.union(v.literal("image"), v.literal("video")),
+    description: v.optional(v.string()), // Vision analysis
+    category: v.optional(v.string()), // Auto-categorized folder
+    project: v.optional(v.union(
+      v.literal("singularity-kiwi"),
+      v.literal("solar-surf"),
+      v.literal("sunshine-healing"),
+      v.literal("business"),
+      v.literal("personal"),
+      v.literal("uncategorized")
+    )),
+    rating: v.optional(v.number()), // 1-5 stars
+    tags: v.optional(v.array(v.string())),
+    thumbnailPath: v.optional(v.string()), // For videos
+    sizeBytes: v.optional(v.number()),
+    capturedAt: v.optional(v.number()), // When media was created
+    createdAt: v.number(),
+  }).index("by_project", ["project"])
+    .index("by_rating", ["rating"])
+    .index("by_type", ["type"]),
 });

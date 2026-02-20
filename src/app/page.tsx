@@ -7,6 +7,7 @@ const navItems = [
   { name: "Dashboard", href: "/", icon: "🌌", emoji: true },
   { name: "Tasks", href: "/tasks", icon: "📋", emoji: true },
   { name: "Content", href: "/content", icon: "🎬", emoji: true },
+  { name: "Media", href: "/media", icon: "📷", emoji: true },
   { name: "Memory", href: "/memory", icon: "🧠", emoji: true },
   { name: "Calendar", href: "/calendar", icon: "📅", emoji: true },
   { name: "Team", href: "/team", icon: "👥", emoji: true },
@@ -57,9 +58,10 @@ export default function Home() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <StatCard title="Active Tasks" value="—" icon="📋" color="blue" href="/tasks" />
           <StatCard title="Content Ideas" value="—" icon="💡" color="yellow" href="/content" />
+          <StatCard title="Media" value="—" icon="📷" color="pink" href="/media" />
           <StatCard title="Memories" value="—" icon="🧠" color="purple" href="/memory" />
           <StatCard title="Upcoming Events" value="—" icon="📅" color="green" href="/calendar" />
         </div>
@@ -72,6 +74,13 @@ export default function Home() {
             icon="🎬"
             href="/content"
             color="from-rose-500 to-orange-500"
+          />
+          <QuickAccessCard
+            title="Media Library"
+            description="Photos, videos with star ratings"
+            icon="📷"
+            href="/media"
+            color="from-pink-500 to-rose-500"
           />
           <QuickAccessCard
             title="Tasks Board"
@@ -142,7 +151,7 @@ function StatCard({
   title: string; 
   value: string; 
   icon: string; 
-  color: "blue" | "yellow" | "purple" | "green";
+  color: "blue" | "yellow" | "purple" | "green" | "pink";
   href: string;
 }) {
   const colors = {
@@ -150,6 +159,7 @@ function StatCard({
     yellow: "from-yellow-500/20 to-orange-500/20 border-yellow-500/30",
     purple: "from-purple-500/20 to-pink-500/20 border-purple-500/30",
     green: "from-green-500/20 to-emerald-500/20 border-green-500/30",
+    pink: "from-pink-500/20 to-rose-500/20 border-pink-500/30",
   };
 
   return (
