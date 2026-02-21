@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -200,6 +200,19 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
   const [showMoveMenu, setShowMoveMenu] = useState(false);
   const [moving, setMoving] = useState(false);
   const updateMedia = useMutation(api.media.update);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  React.useEffect(() => {
+    if (!showMoveMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMoveMenu(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showMoveMenu]);
 
   // Determine what to show as thumbnail
   const thumbnailSrc = getMediaUrl(media.thumbnailPath) || 
@@ -207,10 +220,10 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
 
   const handleMove = async (newProject: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    setShowMoveMenu(false); // Close menu immediately
     setMoving(true);
     await updateMedia({ id: media._id, project: newProject });
     setMoving(false);
-    setShowMoveMenu(false);
   };
 
   return (
@@ -264,7 +277,7 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
         )}
         <div className="flex items-center justify-between mt-2 text-xs">
           {/* Move Button */}
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
               onClick={(e) => {
                 e.stopPropagation();
