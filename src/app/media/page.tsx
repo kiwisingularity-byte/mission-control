@@ -186,15 +186,20 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon?:
   );
 }
 
+// Convert local file path to web URL
+function getMediaUrl(localPath: string | undefined): string | null {
+  if (!localPath) return null;
+  // Convert /Users/singularity/Desktop/Singularity-Media/... to /media/...
+  const mediaPath = localPath.replace(/^\/Users\/singularity\/Desktop\/Singularity-Media\//, "/media/");
+  return mediaPath;
+}
+
 function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }) {
   const [imgError, setImgError] = useState(false);
 
   // Determine what to show as thumbnail
-  const thumbnailSrc = media.thumbnailPath
-    ? `file://${media.thumbnailPath}`
-    : media.type === "image"
-    ? `file://${media.originalPath}`
-    : null;
+  const thumbnailSrc = getMediaUrl(media.thumbnailPath) || 
+    (media.type === "image" ? getMediaUrl(media.originalPath) : null);
 
   return (
     <div
@@ -311,16 +316,16 @@ function MediaDetailModal({
         <div className="bg-slate-800 aspect-video flex items-center justify-center relative">
           {media.type === "video" ? (
             <video
-              src={`file://${media.originalPath}`}
+              src={getMediaUrl(media.originalPath) || undefined}
               controls
               className="w-full h-full object-contain"
-              poster={media.thumbnailPath ? `file://${media.thumbnailPath}` : undefined}
+              poster={getMediaUrl(media.thumbnailPath) || undefined}
             >
               Your browser does not support video playback.
             </video>
           ) : (
             <img
-              src={`file://${media.originalPath}`}
+              src={getMediaUrl(media.originalPath) || undefined}
               alt={media.filename}
               className="w-full h-full object-contain"
             />
