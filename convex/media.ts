@@ -55,7 +55,7 @@ export const create = mutation({
     return await ctx.db.insert("media", {
       ...args,
       project,
-      rating: args.rating || 3, // Default to 3 stars
+      rating: args.rating, // No default - unrated until clicked
       createdAt: now,
     });
   },
@@ -72,14 +72,20 @@ export const update = mutation({
     rating: v.optional(v.number()),
     tags: v.optional(v.array(v.string())),
     thumbnailPath: v.optional(v.string()),
+    clearRating: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { id, project, thumbnailPath, ...updates } = args;
-    await ctx.db.patch(id, {
+    const { id, project, thumbnailPath, clearRating, ...updates } = args;
+    const updateData: Record<string, unknown> = {
       ...updates,
       ...(project !== undefined && { project: project as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "sass" | "business" | "personal" | "uncategorized" }),
       ...(thumbnailPath !== undefined && { thumbnailPath }),
-    });
+    };
+    // Handle rating clearing - Convex needs explicit undefined value to remove
+    if (clearRating) {
+      updateData.rating = undefined;
+    }
+    await ctx.db.patch(id, updateData);
     return await ctx.db.get(id);
   },
 });
@@ -105,6 +111,17 @@ export const remove = mutation({
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
     return { success: true };
+  },
+});
+
+// Clear all ratings (reset to unrated)
+export const clearAllRatings = mutation({
+  handler: async (ctx) => {
+    const all = await ctx.db.query("media").collect();
+    for (const item of all) {
+      await ctx.db.patch(item._id, { rating: undefined });
+    }
+    return { cleared: all.length };
   },
 });
 

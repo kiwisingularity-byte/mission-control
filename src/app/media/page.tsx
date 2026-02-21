@@ -226,6 +226,11 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
     setMoving(false);
   };
 
+  const handleRating = async (newRating: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await updateMedia({ id: media._id, rating: newRating });
+  };
+
   return (
     <div
       onClick={onClick}
@@ -253,12 +258,25 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
             </div>
           </div>
         )}
-        {/* Rating Badge */}
-        {media.rating && (
-          <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1 text-sm font-medium text-yellow-400">
-            {"⭐".repeat(media.rating)}
+        {/* Rating - Clickable on hover */}
+        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm rounded-lg px-2 py-1">
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={(e) => handleRating(star, e)}
+                className={`transition-all hover:scale-125 text-base ${
+                  media.rating && star <= media.rating
+                    ? "text-yellow-400" 
+                    : "text-slate-400 hover:text-yellow-300"
+                }`}
+                title={`Rate ${star} stars`}
+              >
+                {media.rating && star <= media.rating ? "★" : "☆"}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
         {/* Type Badge */}
         <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-sm rounded px-2 py-0.5 text-xs text-slate-300">
           {media.type}
@@ -376,12 +394,12 @@ function MediaDetailModal({
         </div>
 
         {/* Preview */}
-        <div className="bg-slate-800 aspect-video flex items-center justify-center relative">
+        <div className="bg-slate-800 flex items-center justify-center relative max-h-[50vh]">
           {media.type === "video" ? (
             <video
               src={getMediaUrl(media.originalPath) || undefined}
               controls
-              className="w-full h-full object-contain"
+              className="max-h-[50vh] w-auto object-contain"
               poster={getMediaUrl(media.thumbnailPath) || undefined}
             >
               Your browser does not support video playback.
@@ -390,54 +408,54 @@ function MediaDetailModal({
             <img
               src={getMediaUrl(media.originalPath) || undefined}
               alt={media.filename}
-              className="w-full h-full object-contain"
+              className="max-h-[50vh] w-auto object-contain"
             />
           )}
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 space-y-3 max-h-[35vh] overflow-y-auto">
           {/* Filename */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Filename</label>
+            <label className="block text-xs text-slate-400 mb-1">Filename</label>
             <input
               type="text"
               value={filename}
               onChange={(e) => setFilename(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           {/* Star Rating */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Rating</label>
-            <div className="flex gap-2">
+            <label className="block text-xs text-slate-400 mb-1">Rating</label>
+            <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   onClick={() => setRating(star)}
-                  className={`text-3xl transition-transform ${
+                  className={`text-2xl transition-transform ${
                     star <= rating ? "text-yellow-400 scale-110" : "text-slate-600"
                   }`}
                 >
                   ⭐
                 </button>
               ))}
-              <span className="text-slate-400 text-sm ml-2 self-center">
-                {rating}/5 stars
+              <span className="text-slate-400 text-xs ml-2 self-center">
+                {rating}/5
               </span>
             </div>
           </div>
 
           {/* Project */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Project</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-xs text-slate-400 mb-1">Project</label>
+            <div className="flex flex-wrap gap-1">
               {projects.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => setProject(p.id)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                     project === p.id
                       ? "bg-indigo-600 text-white"
                       : "bg-slate-800 text-slate-400 hover:bg-slate-700"
@@ -451,35 +469,31 @@ function MediaDetailModal({
 
           {/* Description */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Description</label>
+            <label className="block text-xs text-slate-400 mb-1">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="AI-generated description from vision model..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 h-24"
+              placeholder="AI-generated description..."
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500 h-16"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Tags (comma-separated)</label>
+            <label className="block text-xs text-slate-400 mb-1">Tags</label>
             <input
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="surfboard, workshop, repair"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              placeholder="tag1, tag2, tag3"
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
           {/* Path */}
-          <div className="text-xs text-slate-500 pt-4 border-t border-slate-800">
+          <div className="text-xs text-slate-500 pt-2 border-t border-slate-800">
             <div className="truncate">
               <span className="text-slate-400">Path:</span> {media.originalPath}
-            </div>
-            <div className="mt-1">
-              <span className="text-slate-400">Created:</span>{" "}
-              {new Date(media.createdAt).toLocaleDateString("en-NZ")}
             </div>
           </div>
         </div>
@@ -518,7 +532,7 @@ function NewMediaModal({ onClose }: { onClose: () => void }) {
   const [type, setType] = useState<"image" | "video">("image");
   const [description, setDescription] = useState("");
   const [project, setProject] = useState<string>("uncategorized");
-  const [rating, setRating] = useState(3);
+  const [rating, setRating] = useState<number | undefined>(undefined);
   const [path, setPath] = useState("");
 
   const createMedia = useMutation(api.media.create);
@@ -531,7 +545,7 @@ function NewMediaModal({ onClose }: { onClose: () => void }) {
       originalPath: path,
       description: description || undefined,
       project,
-      rating,
+      ...(rating ? { rating } : {}),
     });
     onClose();
   };
@@ -588,13 +602,15 @@ function NewMediaModal({ onClose }: { onClose: () => void }) {
 
           {/* Rating */}
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Rating</label>
+            <label className="block text-xs text-slate-400 mb-1">Rating (optional)</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
-                  onClick={() => setRating(star)}
-                  className={`text-2xl ${star <= rating ? "text-yellow-400" : "text-slate-600"}`}
+                  onClick={() => setRating(rating === star ? undefined : star)}
+                  className={`text-2xl transition-transform ${
+                    rating && star <= rating ? "text-yellow-400 scale-110" : "text-slate-600"
+                  }`}
                 >
                   ⭐
                 </button>
