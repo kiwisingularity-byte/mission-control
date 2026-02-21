@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 // Placeholder team data for office view
@@ -56,9 +56,28 @@ const placeholderTeam = [
 export default function OfficePage() {
   const [team] = useState(placeholderTeam);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [isOfficeHours, setIsOfficeHours] = useState(true);
 
-  const workingCount = team.filter((m) => m.status === "working").length;
-  const idleCount = team.filter((m) => m.status === "idle").length;
+  // Check if current time is within office hours (6am-11pm NZT)
+  useEffect(() => {
+    const checkOfficeHours = () => {
+      const now = new Date();
+      // Convert to NZT (UTC+13 or UTC+12 depending on DST)
+      const nztOffset = 13; // Simplified - NZT is UTC+13
+      const nztHour = (now.getUTCHours() + nztOffset) % 24;
+      const isHours = nztHour >= 6 && nztHour < 23;
+      setIsOfficeHours(isHours);
+    };
+    checkOfficeHours();
+    const interval = setInterval(checkOfficeHours, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filter out office manager outside office hours
+  const visibleTeam = team.filter((m) => !m.isManager || isOfficeHours);
+
+  const workingCount = visibleTeam.filter((m) => m.status === "working").length;
+  const idleCount = visibleTeam.filter((m) => m.status === "idle").length;
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -111,12 +130,14 @@ export default function OfficePage() {
             </div>
           </div>
 
-          {/* Manager's Office */}
-          <div className="absolute bottom-32 left-8 bg-indigo-900/40 border border-indigo-700/50 rounded-xl p-4 w-36 h-28 flex flex-col items-center justify-center">
-            <span className="text-2xl mb-1">📋</span>
-            <span className="text-xs text-indigo-300 text-center">Manager's Office</span>
-            <span className="text-[10px] text-indigo-400 mt-1">Every 6 hours</span>
-          </div>
+          {/* Manager's Office - only visible during office hours */}
+          {isOfficeHours && (
+            <div className="absolute bottom-32 left-8 bg-indigo-900/40 border border-indigo-700/50 rounded-xl p-4 w-36 h-28 flex flex-col items-center justify-center">
+              <span className="text-2xl mb-1">📋</span>
+              <span className="text-xs text-indigo-300 text-center">Manager's Office</span>
+              <span className="text-[10px] text-indigo-400 mt-1">Every 6 hours</span>
+            </div>
+          )}
 
           {/* Meeting Room */}
           <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-slate-800/40 border border-slate-700 rounded-xl p-4 w-32 h-24 flex flex-col items-center justify-center">
@@ -131,7 +152,7 @@ export default function OfficePage() {
           </div>
 
           {/* Team Member Desks */}
-          {team.map((member) => (
+          {visibleTeam.map((member) => (
             <DeskArea
               key={member._id}
               member={member as unknown as Record<string, unknown>}
@@ -163,7 +184,7 @@ export default function OfficePage() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-white">{team.length}</p>
+            <p className="text-2xl font-bold text-white">{visibleTeam.length}</p>
             <p className="text-sm text-slate-400">Team Size</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
@@ -172,13 +193,13 @@ export default function OfficePage() {
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
             <p className="text-2xl font-bold text-yellow-400">
-              {team.filter((m) => m.status === "awaiting_input").length}
+              {visibleTeam.filter((m) => m.status === "awaiting_input").length}
             </p>
             <p className="text-sm text-slate-400">Waiting</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
             <p className="text-2xl font-bold text-indigo-400">
-              {Math.round((workingCount / team.length) * 100)}%
+              {Math.round((workingCount / visibleTeam.length) * 100)}%
             </p>
             <p className="text-sm text-slate-400">Utilization</p>
           </div>

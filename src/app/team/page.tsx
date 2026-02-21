@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const roles = [
@@ -69,6 +69,23 @@ const placeholderTeam = [
 export default function TeamPage() {
   const [team] = useState(placeholderTeam);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [isOfficeHours, setIsOfficeHours] = useState(true);
+
+  // Check if current time is within office hours (6am-11pm NZT)
+  useEffect(() => {
+    const checkOfficeHours = () => {
+      const now = new Date();
+      const nztOffset = 13; // NZT is UTC+13
+      const nztHour = (now.getUTCHours() + nztOffset) % 24;
+      setIsOfficeHours(nztHour >= 6 && nztHour < 23);
+    };
+    checkOfficeHours();
+    const interval = setInterval(checkOfficeHours, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filter out Office Manager outside office hours
+  const visibleTeam = team.filter((m) => !m.isCron || isOfficeHours);
 
   const getRoleInfo = (roleId: string) => {
     return roles.find((r) => r.id === roleId) || roles[0];
@@ -102,18 +119,18 @@ export default function TeamPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">{team.length}</p>
+              <p className="text-2xl font-bold text-white">{visibleTeam.length}</p>
               <p className="text-sm text-slate-400">Team Members</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-green-400">
-                {team.filter((m) => m.status === "working").length}
+                {visibleTeam.filter((m) => m.status === "working").length}
               </p>
               <p className="text-sm text-slate-400">Working</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-yellow-400">
-                {team.filter((m) => m.status === "awaiting_input").length}
+                {visibleTeam.filter((m) => m.status === "awaiting_input").length}
               </p>
               <p className="text-sm text-slate-400">Awaiting Input</p>
             </div>
@@ -124,7 +141,7 @@ export default function TeamPage() {
       {/* Team Grid */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {team.map((member) => {
+          {visibleTeam.map((member) => {
             const roleInfo = getRoleInfo(member.role);
             return (
               <div
