@@ -71,12 +71,14 @@ export const update = mutation({
     project: v.optional(v.string()),
     rating: v.optional(v.number()),
     tags: v.optional(v.array(v.string())),
+    thumbnailPath: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, project, ...updates } = args;
+    const { id, project, thumbnailPath, ...updates } = args;
     await ctx.db.patch(id, {
       ...updates,
       ...(project !== undefined && { project: project as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "business" | "personal" | "uncategorized" }),
+      ...(thumbnailPath !== undefined && { thumbnailPath }),
     });
     return await ctx.db.get(id);
   },

@@ -189,6 +189,13 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon?:
 function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }) {
   const [imgError, setImgError] = useState(false);
 
+  // Determine what to show as thumbnail
+  const thumbnailSrc = media.thumbnailPath
+    ? `file://${media.thumbnailPath}`
+    : media.type === "image"
+    ? `file://${media.originalPath}`
+    : null;
+
   return (
     <div
       onClick={onClick}
@@ -196,9 +203,9 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
     >
       {/* Thumbnail */}
       <div className="aspect-video bg-slate-800 relative">
-        {media.type === "image" && !imgError ? (
+        {thumbnailSrc && !imgError ? (
           <img
-            src={`file://${media.originalPath}`}
+            src={thumbnailSrc}
             alt={media.filename}
             className="w-full h-full object-cover"
             onError={() => setImgError(true)}
@@ -206,6 +213,14 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl">
             {media.type === "video" ? "🎥" : "🖼️"}
+          </div>
+        )}
+        {/* Play button overlay for videos */}
+        {media.type === "video" && thumbnailSrc && !imgError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+              <span className="text-3xl text-slate-900 ml-1">▶</span>
+            </div>
           </div>
         )}
         {/* Rating Badge */}
@@ -277,12 +292,12 @@ function MediaDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl my-8">
+      <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-4xl my-8">
         {/* Header */}
         <div className="sticky top-0 bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{media.type === "video" ? "🎥" : "🖼️"}</span>
-            <h2 className="text-lg font-bold text-white">Edit Media</h2>
+            <h2 className="text-lg font-bold text-white">{media.filename}</h2>
           </div>
           <button
             onClick={onClose}
@@ -293,8 +308,23 @@ function MediaDetailModal({
         </div>
 
         {/* Preview */}
-        <div className="bg-slate-800 aspect-video flex items-center justify-center">
-          <div className="text-6xl">{media.type === "video" ? "🎥" : "🖼️"}</div>
+        <div className="bg-slate-800 aspect-video flex items-center justify-center relative">
+          {media.type === "video" ? (
+            <video
+              src={`file://${media.originalPath}`}
+              controls
+              className="w-full h-full object-contain"
+              poster={media.thumbnailPath ? `file://${media.thumbnailPath}` : undefined}
+            >
+              Your browser does not support video playback.
+            </video>
+          ) : (
+            <img
+              src={`file://${media.originalPath}`}
+              alt={media.filename}
+              className="w-full h-full object-contain"
+            />
+          )}
         </div>
 
         {/* Body */}
