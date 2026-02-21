@@ -196,15 +196,26 @@ function getMediaUrl(localPath: string | undefined): string | null {
 
 function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }) {
   const [imgError, setImgError] = useState(false);
+  const [showMoveMenu, setShowMoveMenu] = useState(false);
+  const [moving, setMoving] = useState(false);
+  const updateMedia = useMutation(api.media.update);
 
   // Determine what to show as thumbnail
   const thumbnailSrc = getMediaUrl(media.thumbnailPath) || 
     (media.type === "image" ? getMediaUrl(media.originalPath) : null);
 
+  const handleMove = async (newProject: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMoving(true);
+    await updateMedia({ id: media._id, project: newProject });
+    setMoving(false);
+    setShowMoveMenu(false);
+  };
+
   return (
     <div
       onClick={onClick}
-      className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-indigo-500 hover:ring-1 hover:ring-indigo-500/30 transition-all cursor-pointer group"
+      className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-indigo-500 hover:ring-1 hover:ring-indigo-500/30 transition-all cursor-pointer group relative"
     >
       {/* Thumbnail */}
       <div className="aspect-video bg-slate-800 relative">
@@ -250,8 +261,46 @@ function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }
             {media.description}
           </p>
         )}
-        <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
-          <span className="capitalize">{media.project?.replace("-", " ")}</span>
+        <div className="flex items-center justify-between mt-2 text-xs">
+          {/* Move Button */}
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMoveMenu(!showMoveMenu);
+              }}
+              className="text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+              title="Move to project"
+            >
+              <span className="capitalize">{media.project?.replace("-", " ")}</span>
+              <span className="text-[10px]">▼</span>
+            </button>
+            
+            {showMoveMenu && (
+              <div 
+                className="absolute bottom-full left-0 mb-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 min-w-[140px] py-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-xs text-slate-500 px-3 py-1 border-b border-slate-700 mb-1">Move to...</div>
+                {projects.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={(e) => handleMove(p.id, e)}
+                    disabled={moving || p.id === media.project}
+                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors flex items-center gap-2 ${
+                      p.id === media.project 
+                        ? "text-indigo-400 bg-indigo-500/10" 
+                        : "text-slate-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    <span>{p.icon}</span>
+                    <span>{p.name}</span>
+                    {p.id === media.project && <span className="ml-auto">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
