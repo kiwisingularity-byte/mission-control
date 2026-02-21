@@ -5,6 +5,7 @@ import Link from "next/link";
 
 const roles = [
   { id: "coordinator", name: "Coordinator", icon: "🌌", description: "Main AI - thinking, planning, conversations" },
+  { id: "operations", name: "Operations", icon: "📋", description: "Task tracking, reporting, monitoring" },
   { id: "writer", name: "Writer", icon: "✍️", description: "Blog posts, articles, scripts" },
   { id: "coder", name: "Coder", icon: "💻", description: "Code, CSS, HTML, debugging" },
   { id: "designer", name: "Designer", icon: "🎨", description: "Visual assets, thumbnails, layouts" },
@@ -31,6 +32,16 @@ const placeholderTeam = [
   },
   {
     _id: "2",
+    name: "Office Manager",
+    role: "operations",
+    description: "Monitors tasks, Ollama usage, media library. Reports every 6 hours.",
+    status: "idle",
+    currentTask: "Next check: 2:22 AM",
+    modelId: "glm-5:cloud",
+    isCron: true,
+  },
+  {
+    _id: "3",
     name: "Qwen-Coder",
     role: "coder",
     description: "Code generation and debugging",
@@ -38,7 +49,7 @@ const placeholderTeam = [
     modelId: "qwen2.5:7b",
   },
   {
-    _id: "3",
+    _id: "4",
     name: "Llama-Writer",
     role: "writer",
     description: "Blog posts and article writing",
@@ -46,7 +57,7 @@ const placeholderTeam = [
     modelId: "llama3.2:3b",
   },
   {
-    _id: "4",
+    _id: "5",
     name: "Phi-Quick",
     role: "researcher",
     description: "Fast information gathering",

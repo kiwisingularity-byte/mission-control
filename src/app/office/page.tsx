@@ -16,30 +16,40 @@ const placeholderTeam = [
   },
   {
     _id: "2",
+    name: "Office Manager",
+    role: "Operations",
+    status: "idle",
+    currentTask: "Next check: 2:22 AM",
+    avatarEmoji: "📋",
+    deskPosition: { x: 15, y: 35 },
+    isManager: true,
+  },
+  {
+    _id: "3",
     name: "Qwen-Coder",
     role: "Coder",
     status: "idle",
     currentTask: null,
     avatarEmoji: "💻",
-    deskPosition: { x: 25, y: 60 },
+    deskPosition: { x: 25, y: 65 },
   },
   {
-    _id: "3",
+    _id: "4",
     name: "Llama-Writer",
     role: "Writer",
     status: "idle",
     currentTask: null,
     avatarEmoji: "✍️",
-    deskPosition: { x: 75, y: 60 },
+    deskPosition: { x: 75, y: 65 },
   },
   {
-    _id: "4",
+    _id: "5",
     name: "Phi-Quick",
     role: "Researcher",
     status: "idle",
     currentTask: null,
     avatarEmoji: "🔍",
-    deskPosition: { x: 50, y: 80 },
+    deskPosition: { x: 85, y: 35 },
   },
 ];
 
@@ -101,8 +111,15 @@ export default function OfficePage() {
             </div>
           </div>
 
+          {/* Manager's Office */}
+          <div className="absolute bottom-32 left-8 bg-indigo-900/40 border border-indigo-700/50 rounded-xl p-4 w-36 h-28 flex flex-col items-center justify-center">
+            <span className="text-2xl mb-1">📋</span>
+            <span className="text-xs text-indigo-300 text-center">Manager's Office</span>
+            <span className="text-[10px] text-indigo-400 mt-1">Every 6 hours</span>
+          </div>
+
           {/* Meeting Room */}
-          <div className="absolute top-16 left-8 bg-slate-800/40 border border-slate-700 rounded-xl p-4 w-32 h-24 flex flex-col items-center justify-center">
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-slate-800/40 border border-slate-700 rounded-xl p-4 w-32 h-24 flex flex-col items-center justify-center">
             <span className="text-2xl mb-1">🚪</span>
             <span className="text-xs text-slate-400">Meeting Room</span>
           </div>
