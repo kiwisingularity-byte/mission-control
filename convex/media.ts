@@ -51,7 +51,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    const project = (args.project || "uncategorized") as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "business" | "personal" | "uncategorized";
+    const project = (args.project || "uncategorized") as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "sass" | "business" | "personal" | "uncategorized";
     return await ctx.db.insert("media", {
       ...args,
       project,
@@ -77,7 +77,7 @@ export const update = mutation({
     const { id, project, thumbnailPath, ...updates } = args;
     await ctx.db.patch(id, {
       ...updates,
-      ...(project !== undefined && { project: project as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "business" | "personal" | "uncategorized" }),
+      ...(project !== undefined && { project: project as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "sass" | "business" | "personal" | "uncategorized" }),
       ...(thumbnailPath !== undefined && { thumbnailPath }),
     });
     return await ctx.db.get(id);

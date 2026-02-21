@@ -116,6 +116,7 @@ export default defineSchema({
       v.literal("singularity-kiwi"),
       v.literal("solar-surf"),
       v.literal("sunshine-healing"),
+      v.literal("sass"),
       v.literal("business"),
       v.literal("personal"),
       v.literal("uncategorized")

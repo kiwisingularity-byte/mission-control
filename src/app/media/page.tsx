@@ -10,6 +10,7 @@ const projects = [
   { id: "singularity-kiwi", name: "Singularity.Kiwi", icon: "🌐" },
   { id: "solar-surf", name: "Solar Surf", icon: "🏄" },
   { id: "sunshine-healing", name: "Sunshine Healing", icon: "☀️" },
+  { id: "sass", name: "SASS", icon: "🎨" },
   { id: "business", name: "Business", icon: "💼" },
   { id: "personal", name: "Personal", icon: "📸" },
   { id: "uncategorized", name: "Uncategorized", icon: "📁" },
