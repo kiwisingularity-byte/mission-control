@@ -37,6 +37,15 @@ export default defineSchema({
       v.literal("scheduled"),
       v.literal("published")
     ),
+    project: v.optional(v.union(
+      v.literal("singularity-kiwi"),
+      v.literal("solar-surf"),
+      v.literal("sunshine-healing"),
+      v.literal("sass"),
+      v.literal("business"),
+      v.literal("personal"),
+      v.literal("uncategorized")
+    )),
     content: v.optional(v.string()), // Full script/article content
     notes: v.optional(v.string()),
     thumbnailUrl: v.optional(v.string()),
@@ -44,7 +53,8 @@ export default defineSchema({
     publishedUrl: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_status", ["status"]),
+  }).index("by_status", ["status"])
+    .index("by_project", ["project"]),
 
   // Memory Screen
   memories: defineTable({
@@ -104,6 +114,29 @@ export default defineSchema({
     details: v.optional(v.string()),
     timestamp: v.number(),
   }),
+
+  // Workflows
+  workflows: defineTable({
+    title: v.string(),
+    category: v.union(
+      v.literal("content_creation"),
+      v.literal("media_capture"),
+      v.literal("communication"),
+      v.literal("automation"),
+      v.literal("other")
+    ),
+    trigger: v.string(), // What starts the workflow (e.g., "Email received", "iMessage from Clare")
+    steps: v.string(), // Multi-step description
+    status: v.union(
+      v.literal("active"),
+      v.literal("paused"),
+      v.literal("deprecated")
+    ),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_category", ["category"])
+    .index("by_status", ["status"]),
 
   // Media Library
   media: defineTable({

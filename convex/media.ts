@@ -66,6 +66,7 @@ export const update = mutation({
   args: {
     id: v.id("media"),
     filename: v.optional(v.string()),
+    originalPath: v.optional(v.string()),
     description: v.optional(v.string()),
     category: v.optional(v.string()),
     project: v.optional(v.string()),
@@ -75,11 +76,12 @@ export const update = mutation({
     clearRating: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { id, project, thumbnailPath, clearRating, ...updates } = args;
+    const { id, project, thumbnailPath, originalPath, clearRating, ...updates } = args;
     const updateData: Record<string, unknown> = {
       ...updates,
       ...(project !== undefined && { project: project as "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "sass" | "business" | "personal" | "uncategorized" }),
       ...(thumbnailPath !== undefined && { thumbnailPath }),
+      ...(originalPath !== undefined && { originalPath }),
     };
     // Handle rating clearing - Convex needs explicit undefined value to remove
     if (clearRating) {

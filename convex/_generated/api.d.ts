@@ -16,6 +16,7 @@ import type * as seed from "../seed.js";
 import type * as seedMemories from "../seedMemories.js";
 import type * as tasks from "../tasks.js";
 import type * as team from "../team.js";
+import type * as workflows from "../workflows.js";
 
 import type {
   ApiFromModules,
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   seedMemories: typeof seedMemories;
   tasks: typeof tasks;
   team: typeof team;
+  workflows: typeof workflows;
 }>;
 
 /**

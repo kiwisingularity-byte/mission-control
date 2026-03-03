@@ -6,7 +6,9 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Doc } from "../../../convex/_generated/dataModel";
 
-const projects = [
+type ProjectId = "singularity-kiwi" | "solar-surf" | "sunshine-healing" | "sass" | "business" | "personal" | "uncategorized";
+
+const projects: { id: ProjectId; name: string; icon: string }[] = [
   { id: "singularity-kiwi", name: "Singularity.Kiwi", icon: "🌐" },
   { id: "solar-surf", name: "Solar Surf", icon: "🏄" },
   { id: "sunshine-healing", name: "Sunshine Healing", icon: "☀️" },
@@ -190,9 +192,24 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon?:
 // Convert local file path to web URL
 function getMediaUrl(localPath: string | undefined): string | null {
   if (!localPath) return null;
-  // Convert /Users/singularity/Desktop/Singularity-Media/... to /media/...
-  const mediaPath = localPath.replace(/^\/Users\/singularity\/Desktop\/Singularity-Media\//, "/media/");
-  return mediaPath;
+  
+  // Already a relative path (e.g., "sunshine-healing/file.jpg")
+  if (!localPath.startsWith("/") && !localPath.startsWith("~")) {
+    return `/media/${localPath}`;
+  }
+  
+  // Expand tilde
+  let path = localPath.replace(/^~/, "/Users/singularity");
+  
+  // Convert Singularity-Media paths to /media/ URL
+  path = path.replace(/^\/Users\/singularity\/Desktop\/Singularity-Media\//, "/media/");
+  
+  // Handle Messages attachments (not in media folder - can't serve)
+  if (path.startsWith("/Users/singularity/Library/Messages/")) {
+    return null;
+  }
+  
+  return path;
 }
 
 function MediaCard({ media, onClick }: { media: MediaItem; onClick: () => void }) {

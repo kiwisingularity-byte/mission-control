@@ -34,6 +34,27 @@ export const getByStatus = query({
   },
 });
 
+export const getByProject = query({
+  args: {
+    project: v.union(
+      v.literal("singularity-kiwi"),
+      v.literal("solar-surf"),
+      v.literal("sunshine-healing"),
+      v.literal("sass"),
+      v.literal("business"),
+      v.literal("personal"),
+      v.literal("uncategorized")
+    ),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("content")
+      .withIndex("by_project", (q) => q.eq("project", args.project))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const create = mutation({
   args: {
     title: v.string(),
@@ -53,6 +74,15 @@ export const create = mutation({
       v.literal("scheduled"),
       v.literal("published")
     )),
+    project: v.optional(v.union(
+      v.literal("singularity-kiwi"),
+      v.literal("solar-surf"),
+      v.literal("sunshine-healing"),
+      v.literal("sass"),
+      v.literal("business"),
+      v.literal("personal"),
+      v.literal("uncategorized")
+    )),
     content: v.optional(v.string()),
     notes: v.optional(v.string()),
   },
@@ -62,6 +92,7 @@ export const create = mutation({
       title: args.title,
       type: args.type,
       status: args.status ?? "idea",
+      project: args.project,
       content: args.content,
       notes: args.notes,
       createdAt: now,
@@ -82,6 +113,15 @@ export const update = mutation({
       v.literal("review"),
       v.literal("scheduled"),
       v.literal("published")
+    )),
+    project: v.optional(v.union(
+      v.literal("singularity-kiwi"),
+      v.literal("solar-surf"),
+      v.literal("sunshine-healing"),
+      v.literal("sass"),
+      v.literal("business"),
+      v.literal("personal"),
+      v.literal("uncategorized")
     )),
     content: v.optional(v.string()),
     notes: v.optional(v.string()),
